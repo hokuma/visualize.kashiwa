@@ -1,0 +1,11 @@
+{
+  "name": "visualize.kashiwa",
+  "version": "1.0.0",
+  "main": "index.html",
+  "repository": "git@github.com:hokuma/visualize.kashiwa.git",
+  "author": "hokuma <@halhide>",
+  "scripts": {
+    "start": "static-server"
+  },
+  "devDependencies": {}
+}
