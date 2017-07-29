@@ -1,0 +1,70 @@
+{
+  "consultation_by_doctor": [
+    {
+      "year": 20,
+      "value": 45
+    },
+    {
+      "year": 21,
+      "value": 42 
+    },
+    {
+      "year": 22,
+      "value": 42
+    },
+    {
+      "year": 23,
+      "value": 39
+    },
+    {
+      "year": 24,
+      "value": 35
+    },
+    {
+      "year": 25,
+      "value": 35
+    },
+    {
+      "year": 26,
+      "value": 35
+    },
+    {
+      "year": 27,
+      "value": 35
+    }
+  ],
+  "consultation_by_staff": [
+    {
+      "year": 20,
+      "value": 2408
+    },
+    {
+      "year": 21,
+      "value": 2479 
+    },
+    {
+      "year": 22,
+      "value": 2999
+    },
+    {
+      "year": 23,
+      "value": 4410
+    },
+    {
+      "year": 24,
+      "value": 5890
+    },
+    {
+      "year": 25,
+      "value": 6797
+    },
+    {
+      "year": 26,
+      "value": 7248
+    },
+    {
+      "year": 27,
+      "value": 6660
+    }
+  ]
+}

@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang='ja'>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+    <title>こころの健康相談数 - Visualize Kashiwa</title>
+    <meta name='description' content=''>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel='apple-touch-icon' href='apple-touch-icon.png'>
+
+    <link rel='stylesheet' href='/css/normalize.min.css'>
+    <link rel='stylesheet' href='/css/main.css'>
+
+    <script src='/js/vendor/modernizr.min.js'></script>
+    <script src='https://d3js.org/d3.v4.min.js'></script>
+  </head>
+  <body>
+    <!--[if lt IE 8]>
+      <p class='browserupgrade'>You are using an <strong>outdated</strong> browser. Please <a href='http://browsehappy.com/'>upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+    <div class='container header'>
+      <header class='wrapper'>
+        <h1>Visualize Kashiwa</h1>
+        <h2>こころの健康相談数</h2>
+        <p>柏市民の心の健康相談数です。</p>
+        <dl>
+          <dt>こころの健康相談(精神科医師による相談)</dt>
+          <dd>
+          柏市保健所事業年報より。<br/>
+          <a href='http://www.city.kashiwa.lg.jp/health_hospital/about/1218/index.html' target='_blank'>http://www.city.kashiwa.lg.jp/health_hospital/about/1218/index.html</a>
+          </dd>
+          <dt>職員による電話相談</dt>
+          <dd>
+          柏市保健所事業年報より。<br/>
+          <a href='http://www.city.kashiwa.lg.jp/health_hospital/about/1218/index.html' target='_blank'>http://www.city.kashiwa.lg.jp/health_hospital/about/1218/index.html</a>
+          </dd>
+        </dl>
+     </header>
+    </div>
+    <div class='container main'>
+      <div class='main wrapper'>
+        <svg width='960' height='500'></svg>
+      </div>
+    </div>
+    <script>
+      var svg = d3.select('svg'),
+          margin = {top: 20, right: 150, bottom: 30, left: 50},
+          width = +svg.attr('width') - margin.left - margin.right,
+          height = +svg.attr('height') - margin.top - margin.bottom,
+          g = svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+      var x = d3.scaleBand()
+                .rangeRound([0, width])
+                .padding(0.5)
+                .domain([20,21,22,23,24,25,26,27]);
+
+      g.append('g')
+        .attr('transform', 'translate(0,' + height + ')')
+        .call(d3.axisBottom(x))
+        .append('text')
+        .attr('x', width)
+        .attr('dx', '1em')
+        .attr('dy', '1em')
+        .attr('fill', '#000000')
+        .attr('text-anchor', 'start')
+        .text('平成');
+
+      var y = d3.scaleLinear()
+                .rangeRound([height, 0]);
+
+      d3.json('./data/data.json', function(error, d) {
+        var data = d.consultation_by_doctor;
+        y.domain([30, 45]);
+
+        g.append('g')
+            .call(d3.axisLeft(y))
+          .append('text')
+            .attr('fill', '#000000')
+            .attr('x', 50)
+            .attr('y', -10)
+            .attr('dy', '0.71em')
+            .attr('text-anchor', 'end')
+            .text('回数(医師による相談)');
+
+        var line = d3.line()
+                    .x(function(d) { return x(d.year) + x.bandwidth() / 2; })
+                    .y(function(d) { return y(d.value); });
+
+        g.selectAll('.bar')
+          .data(data)
+          .enter().append('rect')
+          .attr('fill', '#0cab19')
+          .attr('x', function(d) { return x(d.year); })
+          .attr('y', function(d) { return y(d.value); })
+          .attr('width', x.bandwidth())
+          .attr('height', function(d) { return height - y(d.value); });
+
+        data = d.consultation_by_staff;
+        y.domain(d3.extent(data, function(d) { return d.value; }));
+
+        g.append('g')
+            .attr('transform', 'translate(' + width + ',0)')
+            .call(d3.axisRight(y))
+          .append('text')
+            .attr('fill', '#000000')
+            .attr('x', 50)
+            .attr('y', -10)
+            .attr('dy', '0.71em')
+            .attr('text-anchor', 'end')
+            .text('回数(電話相談)');
+
+        g.append('path')
+          .datum(data)
+          .attr('fill', 'none')
+          .attr('stroke', '#165e83')
+          .attr('stroke-linejoin', 'round')
+          .attr('stroke-linecap', 'round')
+          .attr('stroke-width', 1.5)
+          .attr('d', line);
+
+        var legend = g.append('g')
+          .attr('font-size', 10)
+          .attr('text-anchor', 'start')
+          .selectAll('g')
+          .data(['相談', '電話相談'])
+          .enter().append('g')
+          .attr('transform', function(d, i) { return 'translate(0, ' + i * 20 + ')'; })
+
+        var legendColor = {
+          '相談': '#0cab19',
+          '電話相談': '#165e83'
+        };
+        legend.append('rect')
+          .attr('x', width - 15)
+          .attr('width', 10)
+          .attr('height', 10)
+          .attr('fill', function(d) { return legendColor[d]; });
+          
+        legend.append('text')
+          .attr('x', width - 60)
+          .attr('y', 10)
+          .text(function(d) { return d; });
+
+      });
+    </script>
+  </body>
+</html>
