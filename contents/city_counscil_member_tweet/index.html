@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang='ja'>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+    <title>柏市議会議員のtwitterまとめ - Visualize Kashiwa</title>
+    <meta name='description' content=''>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel='apple-touch-icon' href='apple-touch-icon.png'>
+
+    <link rel='stylesheet' href='/css/normalize.min.css'>
+    <link rel='stylesheet' href='/css/main.css'>
+
+    <script src='/js/vendor/modernizr.min.js'></script>
+    <script src='https://d3js.org/d3.v4.min.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/d3-cloud/1.2.4/d3.layout.cloud.min.js'></script>
+  </head>
+  <body>
+    <!--[if lt IE 8]>
+      <p class='browserupgrade'>You are using an <strong>outdated</strong> browser. Please <a href='http://browsehappy.com/'>upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+    <div class='container header'>
+      <header class='wrapper'>
+        <h1>Visualize Kashiwa</h1>
+        <h2>柏市議会議員のtwitterまとめ</h2>
+        <p>柏市議会議員のtwitterのtweetをLDAにかけてトピック分析をした結果です。</p>
+        <dl>
+          <dt>発言はtwitterより</dt>
+          <dd>詳細はこちらの<a href='http://blog.hokuma.net/nlp/analysing_city_council_menber_tweets/'>記事</a>にて</dd>
+        </dl>
+        <ul>
+          <li><a href='#yosukeyama'>@yosukeyama</a></li>
+          <li><a href='#ntsumu'>@ntsumu</a></li>
+          <li><a href='#watabe_kazuko'>@watabe_kazuko</a></li>
+          <li><a href='#mutoh_mitsue'>@mutoh_mitsue</a></li>
+          <li><a href='#Staff_Yoshida'>@Staff_Yoshida</a></li>
+          <li><a href='#stco3953'>@stco3953</a></li>
+     </header>
+    </div>
+    <div class='container main'>
+      <div class='main wrapper'>
+        <div id='yosukeyama'>
+          <p><a href='https://twitter.com/yosukeyama' target='_blank'>@yosukeyama</a></p>
+          <svg id='svg_107010229' width='700' height='500'></svg>
+        </div>
+        <div id='ntsumu'>
+          <p><a href='https://twitter.com/ntsumu' target='_blank'>@ntsumu</a></p>
+          <svg id='svg_110713580' width='700' height='500'></svg>
+        </div>
+        <div id='watabe_kazuko'>
+          <p><a href='https://twitter.com/watabe_kazuko' target='_blank'>@watabe_kazuko</a></p>
+          <svg id='svg_1437932041' width='700' height='500'></svg>
+        </div>
+        <div id='mutoh_mitsue'>
+          <p><a href='https://twitter.com/mutoh_mitsue' target='_blank'>@mutoh_mitsue</a></p>
+          <svg id='svg_1571904108' width='700' height='500'></svg>
+        </div>
+        <div id='Staff_Yoshida'>
+          <p><a href='https://twitter.com/Staff_Yoshida' target='_blank'>@Staff_Yoshida</a></p>
+          <svg id='svg_3225758364' width='700' height='500'></svg>
+        </div>
+        <div id='stco3953'>
+          <p><a href='https://twitter.com/stco3953' target='_blank'>@stco3953</a></p>
+          <svg id='svg_757065319244374016' width='700' height='500'></svg>
+        </div>
+      </div>
+    </div>
+    <script>
+
+      var cloud = d3.layout.cloud;
+      var fill = d3.scaleOrdinal(d3.schemeCategory20)
+
+      d3.json('./data/data.json', function(error, d) {
+        for(var key in d) {
+          var svg = d3.select('#svg_' + key);
+          var topics = d[key];
+          var words = topics.reduce(function(result, topic, index) {
+            var topicWords = topic.map(function(word, word_index) {
+              var surface = Object.keys(word)[0];
+              var prob = word[surface];
+              return {
+                topicId: index,
+                surface: surface,
+                rank: word_index
+              };
+            });
+            return result.concat(topicWords);
+          }, []);
+
+          var layout = cloud()
+            .size([700, 500])
+            .words(words.map(function(word) {
+              return {text: word.surface, topicId: word.topicId, size: (10 + 30 * (10 - word.rank) / 10)};
+            }))
+            .fontSize(function(d) { return d.size; })
+            .on("end", draw);
+
+          layout.start();
+
+          function draw(words) {
+            svg.append('g')
+              .attr('transform', 'translate(' + layout.size()[0] / 2 + ',' + layout.size()[1] / 2 + ')')
+              .selectAll('text')
+              .data(words)
+              .enter().append('text')
+              .style("font-size", function(d) { return d.size + "px"; })
+              .style("fill", function(d) { return fill(d.topicId); })
+              .attr("text-anchor", "middle")
+              .attr("transform", function(d) {
+                return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+              })
+              .text(function(d) { return d.text; });
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
